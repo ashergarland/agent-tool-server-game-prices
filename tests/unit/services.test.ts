@@ -26,6 +26,12 @@ describe('game-price services', () => {
     await expect(
       services.prices.search({ query: 'Nintendo', entity: 'platform' }),
     ).rejects.toMatchObject({ code: 'unsupported_operation' });
+    expect(await services.prices.match({ providerId: '6910', condition: 'graded' })).toMatchObject({
+      status: 'ambiguous',
+    });
+    expect(
+      await services.prices.match({ title: 'Super Mario Bros.', platform: 'NES' }),
+    ).toMatchObject({ status: 'matched' });
   });
 
   it('compares products and gates collection estimates', async () => {
@@ -55,6 +61,22 @@ describe('game-price services', () => {
     expect(estimate.includedTotalMinor).toBe(3000);
     expect(estimate.coverage).toMatchObject({ priced: 1, unmatched: 1 });
     expect(estimate.disclaimer).toContain('not guaranteed');
+
+    const unavailable = await services.prices.estimateCollection([
+      { reference: 'sealed', providerId: '6910', quantity: 1, condition: 'new' },
+    ]);
+    expect(unavailable.entries[0]?.status).toBe('condition-unavailable');
+
+    await expect(
+      services.prices.estimateCollection(
+        Array.from({ length: 26 }, (_, index) => ({
+          reference: String(index),
+          providerId: '6910',
+          quantity: 1,
+          condition: 'loose' as const,
+        })),
+      ),
+    ).rejects.toMatchObject({ code: 'batch_too_large' });
   });
 
   it('wires an injectable application', async () => {

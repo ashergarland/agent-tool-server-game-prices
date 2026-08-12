@@ -9,6 +9,17 @@ const config = () =>
   }).priceCharting;
 
 describe('PriceCharting API provider', () => {
+  it('reports conservative provider capabilities', () => {
+    const provider = new PriceChartingApiProvider(config());
+    expect(provider.capabilities()).toMatchObject({
+      searchableEntities: ['product'],
+      historicalPrices: false,
+      comparableSales: false,
+      pagination: false,
+      cache: { enabled: false },
+    });
+  });
+
   it('encodes search requests and normalizes documented fields', async () => {
     const fetcher = vi.fn<typeof fetch>().mockResolvedValue(
       new Response(
@@ -112,5 +123,40 @@ describe('PriceCharting API provider', () => {
     await expect(malformed.getProduct({ providerId: '1' })).rejects.toMatchObject({
       code: 'provider_response_invalid',
     });
+  });
+
+  it('rejects missing credentials and provider error envelopes', async () => {
+    const missingToken = new PriceChartingApiProvider(
+      testConfig({ PRICECHARTING_API_TOKEN: undefined }).priceCharting,
+    );
+    await expect(missingToken.getProduct({ providerId: '1' })).rejects.toMatchObject({
+      code: 'provider_authentication',
+    });
+
+    const providerError = new PriceChartingApiProvider(config(), {
+      fetch: vi.fn<typeof fetch>().mockResolvedValue(
+        new Response(JSON.stringify({ status: 'error', 'error-message': 'invalid request' }), {
+          status: 200,
+        }),
+      ),
+      sleep: async () => undefined,
+    });
+    await expect(providerError.getProduct({ providerId: '1' })).rejects.toMatchObject({
+      code: 'upstream_error',
+    });
+  });
+
+  it('maps exhausted transient failures as retryable', async () => {
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(new Response('', { status: 503 }));
+    const provider = new PriceChartingApiProvider(config(), {
+      fetch: fetcher,
+      sleep: async () => undefined,
+      random: () => 0.5,
+    });
+    await expect(provider.getProduct({ providerId: '1' })).rejects.toMatchObject({
+      code: 'upstream_error',
+      retryable: true,
+    });
+    expect(fetcher).toHaveBeenCalledTimes(2);
   });
 });

@@ -244,7 +244,14 @@ export class PriceService {
   }
 
   private async estimateEntry(entry: CollectionEntryInput): Promise<CollectionEntryResult> {
-    const match = await this.match(entry);
+    const match = await this.match({
+      providerId: entry.providerId,
+      upc: entry.upc,
+      title: entry.title,
+      platform: entry.platform,
+      edition: entry.edition,
+      region: entry.region,
+    });
     if (match.status !== 'matched' || !match.match) {
       return {
         reference: entry.reference,
