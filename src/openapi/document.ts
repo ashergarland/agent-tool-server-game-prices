@@ -27,9 +27,12 @@ const errorResponses: JsonObject = Object.fromEntries(
     [401, 'Missing or invalid credentials'],
     [403, 'Mutation not permitted'],
     [404, 'Unknown tool or resource'],
+    [409, 'Ambiguous product match'],
     [429, 'Rate limited'],
     [500, 'Tool server failure'],
     [502, 'Provider failure'],
+    [503, 'Provider quota exhausted'],
+    [504, 'Provider timeout'],
   ].map(([status, description]) => [
     String(status),
     {
@@ -121,9 +124,10 @@ export const buildOpenApiDocument = (config: AppConfig, registry: ToolRegistry):
   return {
     openapi: '3.1.0',
     info: {
-      title: 'Agent Tool Server Template',
+      title: 'Game Price Agent Tool Server',
       version: config.service.version,
-      description: 'Replaceable tool server infrastructure generated from one typed tool registry.',
+      description:
+        'Read-only PriceCharting catalog matching and current-price estimates from one typed tool registry.',
     },
     servers: [{ url: config.service.publicBaseUrl ?? `http://localhost:${config.http.port}` }],
     security: config.auth.mode === 'disabled' ? [] : [{ bearerAuth: [] }],

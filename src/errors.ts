@@ -3,6 +3,13 @@ export type ErrorCode =
   | 'unauthorized'
   | 'forbidden'
   | 'not_found'
+  | 'ambiguous_match'
+  | 'unsupported_operation'
+  | 'provider_authentication'
+  | 'provider_rate_limited'
+  | 'provider_timeout'
+  | 'provider_response_invalid'
+  | 'batch_too_large'
   | 'rate_limited'
   | 'upstream_error'
   | 'internal_error';
@@ -12,6 +19,13 @@ const statusByCode: Readonly<Record<ErrorCode, number>> = {
   unauthorized: 401,
   forbidden: 403,
   not_found: 404,
+  ambiguous_match: 409,
+  unsupported_operation: 501,
+  provider_authentication: 502,
+  provider_rate_limited: 503,
+  provider_timeout: 504,
+  provider_response_invalid: 502,
+  batch_too_large: 400,
   rate_limited: 429,
   upstream_error: 502,
   internal_error: 500,

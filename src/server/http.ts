@@ -86,6 +86,13 @@ export const createHttpServer = ({
       mutationsEnabled: config.guardrails.mutationsEnabled,
       confirmationRequired: config.guardrails.confirmationRequired,
       authMode: config.auth.mode,
+      provider: {
+        name: 'PriceCharting',
+        historicalPrices: false,
+        comparableSales: false,
+        cacheEnabled: false,
+        collectionEstimatesEnabled: config.priceCharting.collectionEstimatesEnabled,
+      },
     },
   }));
 

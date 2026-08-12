@@ -13,9 +13,12 @@ describe('tool registry', () => {
   it('exposes unique definitions and schemas', () => {
     const registry = createToolRegistry();
     expect(registry.list().map((tool) => tool.name)).toEqual([
-      'example_list_items',
-      'example_get_item',
-      'example_update_item',
+      'game_prices_get_capabilities',
+      'game_prices_search_catalog',
+      'game_prices_get_product',
+      'game_prices_match_product',
+      'game_prices_compare_products',
+      'game_prices_estimate_collection',
     ]);
     expect(registry.list().every((tool) => tool.inputJsonSchema['type'] === 'object')).toBe(true);
   });
@@ -23,7 +26,7 @@ describe('tool registry', () => {
   it('validates input and output', async () => {
     const services = createServices(testConfig(), new MemoryProvider());
     await expect(
-      createToolRegistry().invoke('example_get_item', {}, services, context),
+      createToolRegistry().invoke('game_prices_get_product', {}, services, context),
     ).rejects.toMatchObject({
       code: 'bad_request',
     });
