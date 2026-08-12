@@ -78,7 +78,7 @@ export class PriceService {
     return this.provider.capabilities();
   }
 
-  public search(input: {
+  public async search(input: {
     query: string;
     entity?: 'product' | 'platform' | 'category' | undefined;
     category?: string | undefined;
@@ -288,7 +288,11 @@ export class PriceService {
       score += 0.55;
       reasons.push('partial normalized title');
     }
-    if (input.platform && product.platform && normalize(product.platform) === normalize(input.platform)) {
+    if (
+      input.platform &&
+      product.platform &&
+      normalize(product.platform) === normalize(input.platform)
+    ) {
       score += 0.2;
       reasons.push('exact platform');
     }
@@ -298,9 +302,7 @@ export class PriceService {
 
   private conflicts(product: NormalizedProduct, input: MatchInput): string[] {
     return (['platform', 'edition', 'region'] as const).flatMap((field) =>
-      input[field] &&
-      product[field] &&
-      normalize(input[field]) !== normalize(product[field])
+      input[field] && product[field] && normalize(input[field]) !== normalize(product[field])
         ? [`${field} conflicts with provider data`]
         : [],
     );

@@ -1,11 +1,5 @@
 export type ProductIdentifierType = 'pricecharting-id' | 'upc';
-export type PriceCondition =
-  | 'loose'
-  | 'complete'
-  | 'new'
-  | 'graded'
-  | 'box-only'
-  | 'manual-only';
+export type PriceCondition = 'loose' | 'complete' | 'new' | 'graded' | 'box-only' | 'manual-only';
 
 export interface CatalogCategory {
   readonly key: string;

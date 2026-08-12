@@ -38,8 +38,6 @@ export const envSchema = z.object({
   RATE_LIMIT_WINDOW_MS: z.coerce.number().int().min(1000).default(60_000),
   AUTH_MODE: z.enum(['api-key', 'disabled']).default('api-key'),
   API_KEYS: csv.default([]),
-  MUTATIONS_ENABLED: booleanish.default(false),
-  MUTATION_CONFIRMATION_REQUIRED: booleanish.default(true),
   PRICECHARTING_API_TOKEN: z.string().min(1).optional(),
   PRICECHARTING_API_BASE_URL: z.url().default('https://www.pricecharting.com/api/'),
   PRICECHARTING_TIMEOUT_MS: z.coerce.number().int().min(100).default(10_000),
@@ -49,10 +47,7 @@ export const envSchema = z.object({
   PRICECHARTING_MAX_BACKOFF_MS: z.coerce.number().int().min(100).default(5_000),
   PRICECHARTING_MAX_SEARCH_RESULTS: z.coerce.number().int().min(1).max(100).default(20),
   PRICECHARTING_MAX_COLLECTION_ENTRIES: z.coerce.number().int().min(1).max(100).default(25),
-  PRICECHARTING_ATTRIBUTION_TEXT: z
-    .string()
-    .min(1)
-    .default('Price data provided by PriceCharting'),
+  PRICECHARTING_ATTRIBUTION_TEXT: z.string().min(1).default('Price data provided by PriceCharting'),
   PRICECHARTING_ATTRIBUTION_URL: z.url().default('https://www.pricecharting.com'),
   PRICECHARTING_REDISTRIBUTION_APPROVED: booleanish.default(false),
   PRICECHARTING_ENABLE_COMPARISON: booleanish.default(true),
@@ -81,10 +76,6 @@ export interface AppConfig {
   readonly auth:
     | { readonly mode: 'disabled' }
     | { readonly mode: 'api-key'; readonly apiKeys: readonly string[] };
-  readonly guardrails: {
-    readonly mutationsEnabled: boolean;
-    readonly confirmationRequired: boolean;
-  };
   readonly priceCharting: {
     readonly apiToken: string | undefined;
     readonly baseUrl: string;
@@ -148,10 +139,6 @@ export const buildConfig = (env: Env): AppConfig => {
       env.AUTH_MODE === 'disabled'
         ? { mode: 'disabled' }
         : { mode: 'api-key', apiKeys: env.API_KEYS },
-    guardrails: {
-      mutationsEnabled: env.MUTATIONS_ENABLED,
-      confirmationRequired: env.MUTATION_CONFIRMATION_REQUIRED,
-    },
     priceCharting: {
       apiToken: env.PRICECHARTING_API_TOKEN,
       baseUrl: env.PRICECHARTING_API_BASE_URL,

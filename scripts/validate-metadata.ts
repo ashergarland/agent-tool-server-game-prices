@@ -15,7 +15,7 @@ const serverSchema = z.object({
       transport: z.object({ type: z.literal('stdio') }),
     }),
   ),
-  remotes: z.array(z.object({ type: z.literal('streamable-http'), url: z.url() })),
+  remotes: z.array(z.object({ type: z.literal('streamable-http'), url: z.url() })).optional(),
 });
 const registrySchema = z.object({
   id: z.string().min(1),

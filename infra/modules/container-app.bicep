@@ -5,12 +5,13 @@ param containerImage string
 param registryServer string
 param identityId string
 param apiKeySecretUri string
+param priceChartingTokenSecretUri string
+param priceChartingRedistributionApproved bool
 param logAnalyticsCustomerId string
 @secure()
 param logAnalyticsSharedKey string
 @secure()
 param applicationInsightsConnectionString string
-param mutationsEnabled bool
 param minReplicas int
 param maxReplicas int
 param tags object
@@ -62,6 +63,11 @@ resource app 'Microsoft.App/containerApps@2024-03-01' = {
           keyVaultUrl: apiKeySecretUri
           identity: identityId
         }
+        {
+          name: 'pricecharting-api-token'
+          keyVaultUrl: priceChartingTokenSecretUri
+          identity: identityId
+        }
       ]
     }
     template: {
@@ -87,8 +93,12 @@ resource app 'Microsoft.App/containerApps@2024-03-01' = {
               secretRef: 'api-key'
             }
             {
-              name: 'MUTATIONS_ENABLED'
-              value: string(mutationsEnabled)
+              name: 'PRICECHARTING_API_TOKEN'
+              secretRef: 'pricecharting-api-token'
+            }
+            {
+              name: 'PRICECHARTING_REDISTRIBUTION_APPROVED'
+              value: string(priceChartingRedistributionApproved)
             }
             {
               name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'

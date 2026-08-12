@@ -75,7 +75,8 @@ export class PriceChartingApiProvider implements PriceChartingProvider {
     this.fetcher = options.fetch ?? fetch;
     this.now = options.now ?? (() => new Date());
     this.sleep =
-      options.sleep ?? ((milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds)));
+      options.sleep ??
+      ((milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds)));
     this.random = options.random ?? Math.random;
     this.attribution = {
       provider: 'PriceCharting',
@@ -134,10 +135,7 @@ export class PriceChartingApiProvider implements PriceChartingProvider {
   public async getProduct(lookup: ProductLookup): Promise<ProductPrices | undefined> {
     const parameters = lookup.providerId ? { id: lookup.providerId } : { upc: lookup.upc ?? '' };
     try {
-      const response = this.parse(
-        productResponseSchema,
-        await this.request('product', parameters),
-      );
+      const response = this.parse(productResponseSchema, await this.request('product', parameters));
       const retrievedAt = this.now().toISOString();
       return {
         product: this.product(response),
@@ -285,10 +283,7 @@ export class PriceChartingApiProvider implements PriceChartingProvider {
     return scheduled;
   }
 
-  private parse<Schema extends z.ZodType>(
-    schema: Schema,
-    value: unknown,
-  ): z.output<Schema> {
+  private parse<Schema extends z.ZodType>(schema: Schema, value: unknown): z.output<Schema> {
     const parsed = schema.safeParse(value);
     if (!parsed.success) {
       throw new AppError('provider_response_invalid', 'PriceCharting returned invalid data');

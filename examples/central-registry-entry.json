@@ -1,6 +1,6 @@
 {
-  "id": "agent-tool-server-template",
-  "repository": "https://github.com/ashergarland/agent-tool-server-template",
+  "id": "agent-tool-server-game-prices",
+  "repository": "https://github.com/ashergarland/agent-tool-server-game-prices",
   "serverMetadata": "server.json",
-  "categories": ["developer-tools", "replace-me"]
+  "categories": ["games", "collectibles", "shopping"]
 }

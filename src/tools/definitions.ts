@@ -6,7 +6,7 @@ export interface ToolInvocationContext {
   readonly principal: string;
 }
 
-export type ToolKind = 'read' | 'write';
+export type ToolKind = 'read';
 
 export interface ToolDefinition<
   InputSchema extends z.ZodType = z.ZodType,
@@ -30,14 +30,7 @@ export const defineTool = <InputSchema extends z.ZodType, OutputSchema extends z
   definition: ToolDefinition<InputSchema, OutputSchema>,
 ): ToolDefinition<InputSchema, OutputSchema> => definition;
 
-const conditionSchema = z.enum([
-  'loose',
-  'complete',
-  'new',
-  'graded',
-  'box-only',
-  'manual-only',
-]);
+const conditionSchema = z.enum(['loose', 'complete', 'new', 'graded', 'box-only', 'manual-only']);
 const attributionSchema = z.object({
   provider: z.literal('PriceCharting'),
   text: z.string(),
@@ -74,7 +67,10 @@ const pricedProductSchema = z.object({
 });
 const matchInputShape = {
   providerId: z.string().min(1).max(100).optional(),
-  upc: z.string().regex(/^\d{6,18}$/).optional(),
+  upc: z
+    .string()
+    .regex(/^\d{6,18}$/)
+    .optional(),
   title: z.string().min(1).max(200).optional(),
   platform: z.string().min(1).max(100).optional(),
   edition: z.string().min(1).max(100).optional(),
@@ -107,9 +103,7 @@ export const capabilitiesTool = defineTool({
       searchableEntities: z.tuple([z.literal('product')]),
       categories: z.array(z.object({ key: z.string(), providerLabel: z.string() })),
       identifiers: z.array(z.enum(['pricecharting-id', 'upc'])),
-      conditions: z.array(
-        z.object({ condition: conditionSchema, providerLabel: z.string() }),
-      ),
+      conditions: z.array(z.object({ condition: conditionSchema, providerLabel: z.string() })),
       structuredFields: z.tuple([z.literal('platform')]),
       currentPrices: z.literal(true),
       historicalPrices: z.literal(false),
@@ -126,7 +120,7 @@ export const capabilitiesTool = defineTool({
       unsupportedFeatures: z.array(z.string()),
     }),
   }),
-  handler: async (_input, services) => ({ capabilities: services.prices.capabilities() }),
+  handler: (_input, services) => Promise.resolve({ capabilities: services.prices.capabilities() }),
 });
 
 export const searchCatalogTool = defineTool({

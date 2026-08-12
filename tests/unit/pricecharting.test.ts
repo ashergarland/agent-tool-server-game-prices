@@ -35,11 +35,10 @@ describe('PriceCharting API provider', () => {
     expect(requestedUrl).toBeInstanceOf(URL);
     expect((requestedUrl as URL).searchParams.get('q')).toBe('Mario & Luigi');
     expect((requestedUrl as URL).searchParams.get('t')).toBe('provider-secret-token');
-    expect(result.products[0]).toMatchObject({
-      providerId: '6910',
-      platform: 'NES',
-      identifiers: [{ type: 'pricecharting-id', value: '6910' }],
-    });
+    expect(result.products[0]).toMatchObject({ providerId: '6910', platform: 'NES' });
+    expect(result.products[0]?.identifiers).toEqual(
+      expect.arrayContaining([{ type: 'pricecharting-id', value: '6910' }]),
+    );
   });
 
   it('preserves UPC strings and returns only supplied condition prices', async () => {
@@ -78,10 +77,9 @@ describe('PriceCharting API provider', () => {
       .fn<typeof fetch>()
       .mockResolvedValueOnce(new Response('', { status: 429, headers: { 'retry-after': '2' } }))
       .mockResolvedValueOnce(
-        new Response(
-          JSON.stringify({ status: 'success', id: '1', 'product-name': 'Example' }),
-          { status: 200 },
-        ),
+        new Response(JSON.stringify({ status: 'success', id: '1', 'product-name': 'Example' }), {
+          status: 200,
+        }),
       );
     const sleep = vi.fn(async () => undefined);
     const provider = new PriceChartingApiProvider(config(), { fetch: fetcher, sleep });

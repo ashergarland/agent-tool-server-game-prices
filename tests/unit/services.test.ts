@@ -20,9 +20,9 @@ describe('game-price services', () => {
 
   it('reports conflicts and unsupported operations without guessing', async () => {
     const services = createServices(testConfig(), new MemoryProvider());
-    expect(
-      await services.prices.match({ providerId: '6910', platform: 'SNES' }),
-    ).toMatchObject({ status: 'ambiguous' });
+    expect(await services.prices.match({ providerId: '6910', platform: 'SNES' })).toMatchObject({
+      status: 'ambiguous',
+    });
     await expect(
       services.prices.search({ query: 'Nintendo', entity: 'platform' }),
     ).rejects.toMatchObject({ code: 'unsupported_operation' });
