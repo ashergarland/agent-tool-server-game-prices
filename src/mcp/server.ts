@@ -30,8 +30,8 @@ export const createMcpServer = (
         outputSchema: shapeOf(tool.outputSchema),
         annotations: {
           readOnlyHint: tool.kind === 'read',
-          destructiveHint: tool.kind === 'write',
-          idempotentHint: tool.kind === 'read',
+          destructiveHint: false,
+          idempotentHint: true,
           openWorldHint: false,
         },
       },

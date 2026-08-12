@@ -52,7 +52,7 @@ describe('HTTP API', () => {
       headers: { 'x-api-key': apiKey },
     });
     expect(response.statusCode).toBe(200);
-    expect(response.json().tools).toHaveLength(3);
+    expect(response.json().tools).toHaveLength(6);
   });
 
   it('rate limits repeated unauthenticated attempts by client IP', async () => {
@@ -98,16 +98,16 @@ describe('HTTP API', () => {
     const app = server();
     const success = await app.inject({
       method: 'POST',
-      url: '/tools/example_get_item',
+      url: '/tools/game_prices_get_product',
       headers: { 'x-api-key': apiKey },
-      payload: { id: 'example-1' },
+      payload: { providerId: '6910' },
     });
     expect(success.statusCode).toBe(200);
-    expect(success.json().result.item.id).toBe('example-1');
+    expect(success.json().result.product.providerId).toBe('6910');
 
     const invalid = await app.inject({
       method: 'POST',
-      url: '/tools/example_get_item',
+      url: '/tools/game_prices_get_product',
       headers: { 'x-api-key': apiKey },
       payload: {},
     });
@@ -115,14 +115,14 @@ describe('HTTP API', () => {
     expect(invalid.json().error.details.issues).toHaveLength(1);
   });
 
-  it('previews guarded mutations and rate limits principals', async () => {
-    const preview = await server().inject({
+  it('invokes read-only capabilities and rate limits principals', async () => {
+    const capabilities = await server().inject({
       method: 'POST',
-      url: '/tools/example_update_item',
+      url: '/tools/game_prices_get_capabilities',
       headers: { 'x-api-key': apiKey },
-      payload: { id: 'example-1', status: 'complete', dryRun: true },
+      payload: {},
     });
-    expect(preview.json().result).toMatchObject({ performed: false, dryRun: true });
+    expect(capabilities.json().result.capabilities.historicalPrices).toBe(false);
 
     const limited = server({ RATE_LIMIT_MAX: 1 });
     expect(
@@ -148,6 +148,6 @@ describe('HTTP API', () => {
   it('publishes the generated OpenAPI document', async () => {
     const response = await server().inject({ method: 'GET', url: '/openapi.json' });
     expect(response.statusCode).toBe(200);
-    expect(response.json().paths['/tools/example_list_items']).toBeDefined();
+    expect(response.json().paths['/tools/game_prices_search_catalog']).toBeDefined();
   });
 });

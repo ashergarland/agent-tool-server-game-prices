@@ -1,7 +1,7 @@
 {
-  "name": "agent-tool-server-template",
+  "name": "agent-tool-server-game-prices",
   "version": "0.1.0",
-  "description": "Reusable Node.js template for typed MCP and HTTP agent tool servers.",
+  "description": "Hosted read-only PriceCharting game and collectible price tools for MCP and HTTP/OpenAPI.",
   "license": "MIT",
   "type": "module",
   "private": true,
@@ -27,7 +27,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ashergarland/agent-tool-server-template.git"
+    "url": "git+https://github.com/ashergarland/agent-tool-server-game-prices.git"
   },
   "dependencies": {
     "@fastify/rate-limit": "^11.2.0",

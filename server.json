@@ -1,26 +1,20 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
-  "name": "io.github.ashergarland/agent-tool-server-template",
-  "description": "Replace this description with the capability supplied by your tool server.",
+  "name": "io.github.ashergarland/agent-tool-server-game-prices",
+  "description": "Read-only PriceCharting catalog matching and current-price estimates.",
   "repository": {
-    "url": "https://github.com/ashergarland/agent-tool-server-template",
+    "url": "https://github.com/ashergarland/agent-tool-server-game-prices",
     "source": "github"
   },
   "version": "0.1.0",
   "packages": [
     {
       "registryType": "npm",
-      "identifier": "agent-tool-server-template",
+      "identifier": "agent-tool-server-game-prices",
       "version": "0.1.0",
       "transport": {
         "type": "stdio"
       }
-    }
-  ],
-  "remotes": [
-    {
-      "type": "streamable-http",
-      "url": "https://tools.example.com/mcp"
     }
   ]
 }

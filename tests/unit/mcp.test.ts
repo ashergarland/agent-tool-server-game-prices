@@ -26,13 +26,13 @@ describe('MCP adapter', () => {
     await Promise.all([server.connect(serverTransport), client.connect(clientTransport)]);
 
     const tools = await client.listTools();
-    expect(tools.tools.map((tool) => tool.name)).toContain('example_list_items');
+    expect(tools.tools.map((tool) => tool.name)).toContain('game_prices_search_catalog');
     const result = await client.callTool({
-      name: 'example_get_item',
-      arguments: { id: 'example-1' },
+      name: 'game_prices_get_product',
+      arguments: { providerId: '6910' },
     });
     expect(result.isError).not.toBe(true);
-    const failure = await client.callTool({ name: 'example_get_item', arguments: {} });
+    const failure = await client.callTool({ name: 'game_prices_get_product', arguments: {} });
     expect(failure.isError).toBe(true);
   });
 });

@@ -6,6 +6,7 @@ LOCATION="${2:-eastus}"
 DEPLOYMENT_NAME="ats-${ENVIRONMENT_NAME}"
 IMAGE_TAG="${IMAGE_TAG:-$(git rev-parse --short=12 HEAD)}"
 SECRET_NAME="tool-server-api-key"
+PRICECHARTING_SECRET_NAME="pricecharting-api-token"
 BOOTSTRAP_PRINCIPAL_OBJECT_ID="$(az ad signed-in-user show --query id -o tsv)"
 
 az bicep build --file infra/main.bicep >/dev/null
@@ -47,9 +48,24 @@ for attempt in {1..12}; do
 done
 unset API_KEY
 
+if [[ -z "${PRICECHARTING_API_TOKEN:-}" ]]; then
+  printf 'Set PRICECHARTING_API_TOKEN to a subscribed PriceCharting API token.\n' >&2
+  exit 1
+fi
+if [[ "${PRICECHARTING_REDISTRIBUTION_APPROVED:-false}" != "true" ]]; then
+  printf 'Production hosting requires written PriceCharting redistribution permission. Set PRICECHARTING_REDISTRIBUTION_APPROVED=true only after obtaining it.\n' >&2
+  exit 1
+fi
+az keyvault secret set \
+  --vault-name "$KEY_VAULT_NAME" \
+  --name "$PRICECHARTING_SECRET_NAME" \
+  --value "$PRICECHARTING_API_TOKEN" \
+  --only-show-errors >/dev/null
+unset PRICECHARTING_API_TOKEN
+
 az acr build \
   --registry "$REGISTRY_NAME" \
-  --image "agent-tool-server:${IMAGE_TAG}" \
+  --image "agent-tool-server-game-prices:${IMAGE_TAG}" \
   --build-arg "GIT_SHA=${IMAGE_TAG}" \
   --build-arg "SERVICE_VERSION=${SERVICE_VERSION:-0.1.0}" \
   . \
@@ -63,6 +79,7 @@ az deployment sub create \
     environmentName="$ENVIRONMENT_NAME" \
     location="$LOCATION" \
     deployApp=true \
+    priceChartingRedistributionApproved=true \
     bootstrapPrincipalObjectId="$BOOTSTRAP_PRINCIPAL_OBJECT_ID" \
-    containerImage="${REGISTRY_SERVER}/agent-tool-server:${IMAGE_TAG}" \
+    containerImage="${REGISTRY_SERVER}/agent-tool-server-game-prices:${IMAGE_TAG}" \
   --only-show-errors
